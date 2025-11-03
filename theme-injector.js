@@ -1,216 +1,239 @@
-/* ==========================================================
-   GHL Blue Theme (Layout-Safe Edition)
-   ========================================================== */
+(function () {
+  console.log("Highfy Builder script loaded ✅");
 
-:root {
-  --ghl-primary: #2563eb;
-  --ghl-primary-light: #60a5fa;
-  --ghl-primary-dark: #1e40af;
-  --ghl-accent: #38bdf8;
-  --ghl-bg-main: #f8fafc;
-  --ghl-bg-card: #ffffff;
-  --ghl-text-main: #0f172a;
-  --ghl-text-light: #ffffff;
-  --ghl-text-muted: #64748b;
-  --ghl-border: #e2e8f0;
-}
+  // --- Add modern round button styles
+  const style = document.createElement("style");
+  style.textContent = `
+    #ghl-theme-builder-btn {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-size: 20px;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      z-index: 10;
+      margin-right: 10px;
+    }
 
-/* Base background & font */
-body,
-.hl_wrapper,
-.hl_main {
-  background: var(--ghl-bg-main) !important;
-  color: var(--ghl-text-main) !important;
-  font-family: "Inter", "Roboto", system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
-}
+    #ghl-theme-builder-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(37,99,235,0.35);
+    }
 
-/* ================= HEADER ================= */
-header,
-.hl_header,
-.topbar,
-.hl_nav_header {
-  background: linear-gradient(135deg, var(--ghl-primary-dark) 0%, var(--ghl-primary) 100%) !important;
-  color: var(--ghl-text-light) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15) !important;
-}
+    /* Tooltip */
+    #highfy-tooltip {
+      position: absolute;
+      right: 55px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #111827;
+      color: #ffffff;
+      font-size: 13px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
 
-/* Header links & text */
-header a,
-header nav a,
-header .nav-link,
-.topbar a,
-.hl_header a,
-header span,
-header .text,
-header .menu-item {
-  color: var(--ghl-text-light) !important;
-  font-weight: 500 !important;
-  opacity: 0.95 !important;
-  text-decoration: none !important;
-}
+    #ghl-theme-builder-btn:hover #highfy-tooltip {
+      opacity: 1;
+    }
 
-/* Header hover */
-header a:hover,
-header .nav-link:hover,
-.topbar a:hover {
-  opacity: 1 !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-radius: 6px !important;
-}
+    /* Popup theme list */
+    #ghl-theme-popup {
+      backdrop-filter: blur(10px);
+    }
 
-/* Header buttons */
-header button,
-header .btn,
-.hl_header .icon-button,
-.topbar button {
-  background: rgba(255, 255, 255, 0.12) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  color: var(--ghl-text-light) !important;
-  transition: all 0.2s ease !important;
-}
+    #ghl-theme-popup strong {
+      color: #111827;
+    }
+  `;
+  document.head.appendChild(style);
 
-header button:hover,
-header .btn:hover,
-.topbar button:hover {
-  background: rgba(255, 255, 255, 0.25) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  transform: translateY(-1px) !important;
-}
+  // --- Theme definitions
+  const THEMES = [
+    { name: "Blue", url: "https://umairyousaf143.github.io/ghl-themebuilder/theme-blue.css", color: "#2563eb" },
+    { name: "Dark", url: "https://umairyousaf143.github.io/ghl-themebuilder/theme-dark.css", color: "#0f172a" },
+    { name: "Green", url: "https://umairyousaf143.github.io/ghl-themebuilder/theme-green.css", color: "#16a34a" }
+  ];
+  const STORAGE_KEY = "ghl-selected-theme-url";
 
-/* Header icons fix */
-header svg,
-header i {
-  fill: var(--ghl-text-light) !important;
-  color: var(--ghl-text-light) !important;
-}
+  // --- Wait until header loads
+  function waitForHeader(attempt = 0) {
+    const header =
+      document.querySelector('[data-testid="header-right-actions"]') ||
+      document.querySelector("header .right") ||
+      document.querySelector("header") ||
+      document.querySelector(".topbar");
 
-/* Help icon fix (visible) */
-header [aria-label*="help"],
-header .help-icon,
-header .hl-help {
-  filter: brightness(1.2) !important;
-  opacity: 1 !important;
-}
+    if (!header) {
+      if (attempt < 20) setTimeout(() => waitForHeader(attempt + 1), 800);
+      else console.warn("⏳ GHL header not found after multiple attempts.");
+      return;
+    }
 
-/* ================= SIDEBAR ================= */
-aside,
-.hl_sidebar,
-.hl_navbar,
-.hl_leftbar,
-.menu-sidebar {
-  background: linear-gradient(180deg, var(--ghl-primary-dark) 0%, var(--ghl-primary) 100%) !important;
-  color: var(--ghl-text-light) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.12) !important;
-}
+    injectButton(header);
+    applySavedTheme();
+  }
 
-/* Logo glow */
-aside .hl_nav_logo img {
-  filter: brightness(1.1) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3)) !important;
-  transition: filter 0.3s ease, transform 0.3s ease !important;
-}
-aside .hl_nav_logo img:hover {
-  filter: brightness(1.25) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.4)) !important;
-  transform: scale(1.05) !important;
-}
+  // --- Apply selected theme
+  function applyThemeUrl(url) {
+    if (!url) return;
+    let link = document.getElementById("ghl-theme-link");
+    if (link) link.href = url;
+    else {
+      link = document.createElement("link");
+      link.id = "ghl-theme-link";
+      link.rel = "stylesheet";
+      link.href = url;
+      document.head.appendChild(link);
+    }
+    try {
+      localStorage.setItem(STORAGE_KEY, url);
+    } catch (e) {}
+  }
 
-/* Sidebar items */
-.hl_nav_item,
-.menu-item,
-.nav-link {
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-weight: 600 !important;
-  border-radius: 8px !important;
-  transition: all 0.2s ease !important;
-}
+  // --- Restore saved theme
+  function applySavedTheme() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) applyThemeUrl(saved);
+    } catch (e) {}
+  }
 
-/* Sidebar hover */
-.hl_nav_item:hover,
-.menu-item:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
-  color: var(--ghl-text-light) !important;
-  transform: none !important;
-}
+  // --- Inject round button into header
+  function injectButton(header) {
+    if (document.getElementById("ghl-theme-builder-btn")) return;
 
-/* Active menu */
-.hl_nav_item.active,
-.menu-item.active {
-  background: rgba(255, 255, 255, 0.25) !important;
-  color: var(--ghl-text-light) !important;
-  font-weight: 700 !important;
-}
+    const wrapper = document.createElement("div");
+    wrapper.id = "ghl-theme-builder-wrapper";
+    wrapper.style.display = "flex";
+    wrapper.style.alignItems = "center";
+    wrapper.style.marginLeft = "12px";
 
-/* Icons */
-.hl_nav_item svg,
-.menu-item svg {
-  color: rgba(255, 255, 255, 0.9) !important;
-  transition: all 0.2s ease !important;
-}
-.hl_nav_item:hover svg {
-  color: var(--ghl-accent) !important;
-  transform: none !important;
-}
+    const btn = document.createElement("button");
+    btn.id = "ghl-theme-builder-btn";
+    btn.title = "Highfy Builder";
 
-/* Section titles */
-.hl_nav_group_title {
-  color: rgba(255, 255, 255, 0.6) !important;
-  text-transform: uppercase !important;
-  font-size: 11px !important;
-  font-weight: 700 !important;
-}
+    // 🎨 Icon (replace emoji if you want SVG or custom icon)
+    btn.innerHTML = `
+      <span>🎨</span>
+      <div id="highfy-tooltip">Highfy Builder</div>
+    `;
 
-/* ================= BUTTONS ================= */
-button,
-.hl-btn,
-.btn-primary {
-  background: linear-gradient(135deg, var(--ghl-primary) 0%, var(--ghl-primary-light) 100%) !important;
-  color: var(--ghl-text-light) !important;
-  border: none !important;
-  border-radius: 8px !important;
-  font-weight: 600 !important;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
-  transition: all 0.2s ease !important;
-}
-button:hover,
-.hl-btn:hover {
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35) !important;
-  filter: brightness(1.05) !important;
-}
+    wrapper.appendChild(btn);
+    header.appendChild(wrapper);
 
-/* ================= CARDS ================= */
-.card,
-.hl_card {
-  background: var(--ghl-bg-card) !important;
-  border: 1px solid var(--ghl-border) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
-}
-.card:hover,
-.hl_card:hover {
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12) !important;
-  border-color: var(--ghl-primary-light) !important;
-}
+    // Keep aligned right
+    header.style.display = "flex";
+    header.style.alignItems = "center";
+    header.style.justifyContent = "flex-end";
 
-/* ================= SCROLLBAR ================= */
-::-webkit-scrollbar {
-  width: 10px !important;
-}
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--ghl-primary-dark), var(--ghl-primary)) !important;
-  border-radius: 6px !important;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--ghl-primary) !important;
-}
-::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.05) !important;
-}
+    // --- Click opens popup
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const existing = document.getElementById("ghl-theme-popup");
+      if (existing) existing.remove();
+      else createPopup(btn);
+    });
 
-/* ================= FOOTER ================= */
-footer,
-.hl_footer {
-  background: linear-gradient(135deg, var(--ghl-primary-dark) 0%, var(--ghl-primary) 100%) !important;
-  color: var(--ghl-text-light) !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
+    // --- Close popup on outside click
+    document.addEventListener("click", (ev) => {
+      const p = document.getElementById("ghl-theme-popup");
+      if (p && !p.contains(ev.target) && ev.target.id !== "ghl-theme-builder-btn") p.remove();
+    });
+  }
+
+  // --- Popup UI
+  function createPopup(btn) {
+    const popup = document.createElement("div");
+    popup.id = "ghl-theme-popup";
+    Object.assign(popup.style, {
+      position: "fixed",
+      top: btn.getBoundingClientRect().bottom + 10 + "px",
+      right: "20px",
+      width: "250px",
+      background: "#ffffff",
+      borderRadius: "10px",
+      boxShadow: "0 10px 30px rgba(2,6,23,0.15)",
+      padding: "12px",
+      zIndex: 99999,
+      fontFamily: 'Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial',
+    });
+
+    popup.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <strong style="font-size:14px">Highfy Builder</strong>
+        <small style="color:#65748b">Select Theme</small>
+      </div>
+      <div id="ghl-theme-list" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+      <div style="margin-top:10px;display:flex;justify-content:flex-end">
+        <button id="ghl-theme-reset" style="background:#f3f4f6;border:none;padding:6px 10px;border-radius:8px;cursor:pointer">Reset</button>
+      </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    const list = popup.querySelector("#ghl-theme-list");
+    THEMES.forEach((t) => {
+      const item = document.createElement("button");
+      item.className = "ghl-theme-item";
+      item.title = t.name;
+      Object.assign(item.style, {
+        background: "#fff",
+        border: "1px solid #e6eef7",
+        padding: "8px",
+        borderRadius: "8px",
+        cursor: "pointer",
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        justifyContent: "flex-start",
+        transition: "0.2s ease",
+      });
+
+      const sw = document.createElement("span");
+      sw.style.width = "24px";
+      sw.style.height = "24px";
+      sw.style.borderRadius = "50%";
+      sw.style.background = t.color;
+      sw.style.boxShadow = "inset 0 -2px 6px rgba(0,0,0,0.08)";
+      sw.style.flex = "0 0 24px";
+
+      const label = document.createElement("div");
+      label.innerHTML = `<div style="font-weight:600;font-size:13px">${t.name}</div>`;
+
+      item.appendChild(sw);
+      item.appendChild(label);
+
+      item.addEventListener("click", () => {
+        applyThemeUrl(t.url);
+        item.style.boxShadow = "0 4px 10px rgba(37,99,235,0.15)";
+      });
+
+      list.appendChild(item);
+    });
+
+    popup.querySelector("#ghl-theme-reset").addEventListener("click", () => {
+      const link = document.getElementById("ghl-theme-link");
+      if (link) link.remove();
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (e) {}
+      popup.remove();
+    });
+  }
+
+  waitForHeader();
+})();
