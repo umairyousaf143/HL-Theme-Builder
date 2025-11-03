@@ -63,7 +63,7 @@
 
   // --- Theme definitions
   const THEMES = [
-    { name: "Blue", url: "https://umairyousaf143.github.io/ghl-themebuilder/theme-blue.css", color: "#2563eb" },
+    { name: "Blue", url: "https://umairyousaf143.github.io/HL-Theme-Builder/theme-blue.css", color: "#2563eb" },
     { name: "Dark", url: "https://umairyousaf143.github.io/ghl-themebuilder/theme-dark.css", color: "#0f172a" },
     { name: "Green", url: "https://umairyousaf143.github.io/ghl-themebuilder/theme-green.css", color: "#16a34a" }
   ];
@@ -237,3 +237,4 @@
 
   waitForHeader();
 })();
+
